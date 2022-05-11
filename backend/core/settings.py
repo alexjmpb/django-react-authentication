@@ -37,8 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     'api',
+    'authentication.apps.AuthenticationConfig',
 
     'rest_framework',
 ]
@@ -139,3 +140,5 @@ if USE_S3:
 else:
     MEDIA_ROOT = 'media'
     MEDIA_URL = '/media/'
+
+AUTH_USER_MODEL = 'authentication.AppUser'
