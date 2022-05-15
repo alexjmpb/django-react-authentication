@@ -59,7 +59,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -142,3 +142,11 @@ else:
     MEDIA_URL = '/media/'
 
 AUTH_USER_MODEL = 'authentication.AppUser'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+AUTHENTICATION_APP = {
+    'DOMAIN': env('DOMAIN'),
+    'SITE_NAME': env('SITE_NAME'),
+    'PROTOCOL': 'http'
+}
