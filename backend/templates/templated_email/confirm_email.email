@@ -1,0 +1,11 @@
+{% block subject %}{{ site_name }} - Confirm email{% endblock %}
+{% block plain %}
+  Hi, we received a request from you to confirm on {{ site_name }}.
+
+  To confirm your email you can enter to this link:
+
+  {{ url }}
+
+  Thanks,
+  the {{ site_name }} team
+{% endblock %}

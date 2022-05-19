@@ -1,0 +1,11 @@
+{% block subject %}Welcome to {{ site_name }} {% endblock %}
+{% block plain %}
+  Hi, {{ username }}, in {{ site_name }} we are glad you joined to us, the next step to follow is to confirm your email.
+
+  You can confirm your email entering on this link:
+
+  {{ confirm_url }}
+
+  Thanks,
+  the {{ site_name }} team.
+{% endblock %}

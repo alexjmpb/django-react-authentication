@@ -1,0 +1,13 @@
+{% block subject %}{{ site_name }} - Reset password{% endblock %}
+{% block plain %}
+  Hi, we received a request from you to reset your password on {{ site_name }}.
+
+  To reset your password you can enter to this link:
+
+  {{ url }}
+
+  In case you also forgot your username is: {{ username }}
+
+  Thanks,
+  the {{ site_name }} team
+{% endblock %}

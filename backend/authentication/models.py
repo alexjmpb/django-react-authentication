@@ -1,10 +1,16 @@
+import datetime
+
 from django.db import models
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+from django.utils import timezone
 
+from .utils import send_confirm_email
 
 def user_directory_path(instance, filename):
     return f'{instance.username}/{filename}'
@@ -65,10 +71,12 @@ class AppUser(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
     email_confirmed = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
+    last_email_update = models.DateTimeField(default=timezone.now)
 
     objects = AppUserManager()
 
     USERNAME_FIELD = 'username'
+    EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = ['email']
 
     def get_by_natural_key(self):
@@ -86,3 +94,17 @@ class AppUser(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
+
+
+@receiver(pre_save, sender=AppUser)
+def email_confirm_status_change(sender, instance, **kwargs):
+    try:
+        obj = sender.objects.get(pk=instance.pk)
+    except sender.DoesNotExist:
+        pass
+    else:
+        if not obj.email == instance.email:
+            obj.email_confirmed = False
+            obj.last_email_update = timezone.make_aware(datetime.datetime.now())
+            obj.save()
+            send_confirm_email(obj)
