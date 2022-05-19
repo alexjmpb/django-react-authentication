@@ -52,7 +52,8 @@ class UserViewSet(viewsets.ModelViewSet):
             permission_classes = [AllowAny]
         elif (
             self.action == 'update' or
-            self.action == 'partial_update'
+            self.action == 'partial_update' or
+            self.action == 'detail'
         ):
             permission_classes = [IsOwner]
         else:
@@ -162,5 +163,16 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'])
+    def me(self, request):
+        if request.user.is_authenticated:
+            user = User.objects.get(pk=request.user.id)
+            serializer = UserSerializer(instance=user)
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
     
