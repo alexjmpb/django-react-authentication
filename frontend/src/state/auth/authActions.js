@@ -3,9 +3,8 @@ import {
     AUTH_REQUEST,
     AUTH_SUCCESS,
     AUTH_FAIL,
-    USER_REQUEST,
-    USER_SUCCESS,
-    USER_FAIL,
+    START_SUBMIT,
+    FINISH_SUBMIT,
 } from './authActionTypes'
 
 function authRequest() {
@@ -28,8 +27,6 @@ function authFail() {
 }
 
 export function checkAuth() {
-	const accessToken = localStorage.getItem('access_token')
-
 	return async function getAuth(dispatch, getState) {
 		dispatch(authRequest())
 		try {
@@ -38,5 +35,17 @@ export function checkAuth() {
 		} catch(e) {
 			dispatch(authFail())
 		}
+	}
+}
+
+export function startSubmit() {
+	return {
+		type: START_SUBMIT
+	}
+}
+
+export function finishSubmit() {
+	return {
+		type: FINISH_SUBMIT
 	}
 }

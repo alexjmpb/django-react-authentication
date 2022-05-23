@@ -152,7 +152,13 @@ else:
 
 AUTH_USER_MODEL = 'authentication.AppUser'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 AUTHENTICATION_APP = {
     'DOMAIN': env('DOMAIN'),
@@ -167,8 +173,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=env.int('ACCESS_LIFETIME_MINUTES')),
-    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=env.int('REFRESH_LIFETIME_MINUTES')),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=env.float('ACCESS_LIFETIME_MINUTES')),
+    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=env.float('REFRESH_LIFETIME_MINUTES')),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
@@ -194,6 +200,6 @@ SIMPLE_JWT = {
     'JTI_CLAIM': 'jti',
 
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=env.int('ACCESS_LIFETIME_MINUTES')),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(minutes=env.int('REFRESH_LIFETIME_MINUTES')),
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=env.float('ACCESS_LIFETIME_MINUTES')),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(minutes=env.float('REFRESH_LIFETIME_MINUTES')),
 }

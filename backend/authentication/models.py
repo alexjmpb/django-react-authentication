@@ -60,7 +60,7 @@ class AppUser(AbstractBaseUser):
     )
     email = models.EmailField(
         max_length=255,
-        unique=True,
+        # unique=True,
 
     )
     image = models.ImageField(
@@ -78,6 +78,9 @@ class AppUser(AbstractBaseUser):
     USERNAME_FIELD = 'username'
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = ['email']
+
+    def __name__(self):
+        return 'User'
 
     def get_by_natural_key(self):
         return self.username.lower()
@@ -107,4 +110,4 @@ def email_confirm_status_change(sender, instance, **kwargs):
             obj.email_confirmed = False
             obj.last_email_update = timezone.make_aware(datetime.datetime.now())
             obj.save()
-            send_confirm_email(obj)
+            send_confirm_email(instance)

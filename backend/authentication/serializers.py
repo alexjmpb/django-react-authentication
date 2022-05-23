@@ -8,6 +8,8 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.tokens import default_token_generator
 
+from .utils import validate_unique
+
 User = get_user_model()
 
 hashid = hashids.Hashids(salt=settings.SECRET_KEY)
@@ -143,6 +145,16 @@ class CreateUserSerializer(PasswordMixin, serializers.Serializer):
     username = serializers.CharField(max_length=25)
     email = serializers.EmailField(max_length=255)
     image = serializers.ImageField(required=False)
+
+    def validate(self, data):
+        email = data.get('email', None)
+        username = data.get('username', None)
+
+        validate_unique(email, 'email', User)
+        validate_unique(username, 'username', User)
+
+        super().validate(data)
+        return data
     
     def save(self):
         password = self.validated_data.pop('password', None)
@@ -164,6 +176,16 @@ class UpdateUserSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=25)
     email = serializers.EmailField(max_length=255)
     image = serializers.ImageField(required=False)
+
+    def validate(self, data):
+        email = data.get('email', None)
+        username = data.get('username', None)
+
+        if email: validate_unique(email, 'email', User, update=True, instance=self.instance)
+        if username: validate_unique(username, 'username', User, update=True, instance=self.instance)
+
+        super().validate(data)
+        return data
 
     def save(self):
         instance = self.instance

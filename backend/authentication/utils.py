@@ -1,6 +1,7 @@
 """
 Utils for user auth app
 """
+from django.core.exceptions import ValidationError
 import hashids
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
@@ -19,7 +20,7 @@ def send_confirm_email(user):
 
     send_templated_mail(
         template_name='confirm_email',
-        from_email='from@email.com',
+        from_email=getattr(settings, 'DEFAULT_FROM_EMAIL'),
         recipient_list=[user.email],
         context={
             'domain': domain,
@@ -52,3 +53,15 @@ def create_token_url(user, domain=None, path=None):
     url = f'{protocol}://{domain}/{path}'
 
     return url
+
+def validate_unique(value, field, model, update=False, instance=None):
+    query = model.objects.filter(**{field: value})
+    if update and instance is not None:
+        query = query.exclude(**{field: getattr(instance, field, None)})
+
+    is_unique = len(query) == 0
+
+    if not is_unique:
+        raise ValidationError({field: f'There\'s already a {model.__name__} with this {field}'})
+
+    return len(query) == 0

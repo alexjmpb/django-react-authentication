@@ -1,18 +1,25 @@
 import React, { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { checkAuth } from '../state/auth/authActions'
 
 const Homepage = () => {
   const dispatch = useDispatch()
-	const isAuth = useSelector(state => state.auth.isAuth)
-  const loading = useSelector(state => state.auth.loading)
 
   useEffect(() => {
     dispatch(checkAuth());
   }, [])
 
   return (
-    <div>Homepage {isAuth}</div>
+    <main className="page">
+      <div className="container">
+        <div className="container__header">
+          <h2 className="container__title">Homepage</h2>
+        </div>
+        <div className="container__body">
+          <p>This is a public page.</p>
+        </div>
+      </div>
+    </main>
   )
 }
 
