@@ -8,6 +8,7 @@ from rest_framework.permissions import (
 from rest_framework import permissions
 from django.contrib.auth import get_user_model
 from templated_email import send_templated_mail
+from django.conf import settings
 
 from . serializers import (
     ConfirmEmailSerializer,
@@ -80,7 +81,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
             send_templated_mail(
                 template_name='welcome_email',
-                from_email='from@email.com',
+                from_email=getattr(settings, 'DEFAULT_FROM_EMAIL'),
                 recipient_list=[user.email],
                 context={
                     'domain': domain,
@@ -94,9 +95,9 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['post'])
-    def set_password(self, request, pk):
-        user = self.get_object()
+    @action(detail=False, methods=['post'])
+    def set_password(self, request):
+        user = request.user
         serializer = SetPasswordSerializer(data=request.data, instance=user)
 
         if serializer.is_valid():
@@ -115,11 +116,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
             send_templated_mail(
                 template_name='reset_email',
-                from_email='from@email.com',
+                from_email=getattr(settings, 'DEFAULT_FROM_EMAIL'),
                 recipient_list=[user.email],
                 context={
                     'domain': domain,
-                    'site_name': domain,
+                    'site_name': site_name,
                     'username': user.username,
                     'url': url
                 }
@@ -164,15 +165,24 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get', 'patch', 'put'])
     def me(self, request):
-        if request.user.is_authenticated:
-            user = User.objects.get(pk=request.user.id)
-            serializer = UserSerializer(instance=user)
-            
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
+        if not request.user.is_authenticated:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
+        user = User.objects.get(pk=request.user.id)
+        if request.method == 'PATCH' or request.method == 'PUT':
+            serializer = UpdateUserSerializer(instance=user, data=request.data)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            serializer = UserSerializer(instance=user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+            
 
 
     

@@ -1,4 +1,5 @@
 import re
+from django.core.exceptions import ValidationError
 
 from rest_framework.test import APITestCase
 from rest_framework import status
@@ -31,6 +32,20 @@ class UserTests(APITestCase):
         self.assertGreater(len(mail.outbox), 0)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    def test_unique_create(self):
+        url = reverse('user-list')
+
+        info = {
+            'username': 'Test',
+            'email': 'test@test.com',
+            'password': 'Test1234',
+            're_password': 'Test1234'
+        }
+
+        response = self.client.post(url, info)
+
+        self.assertRaises(ValidationError)
+
     def test_update_user(self):
         self.client.force_authenticate(user=self.user)
 
@@ -44,6 +59,22 @@ class UserTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertGreater(len(mail.outbox), 0)
+    
+    def test_unique_update(self):
+        self.client.force_authenticate(user=self.user)
+
+        url = reverse('user-detail', kwargs={'pk': 1})
+        info = {
+            'username': 'Test2',
+            'email': 'test@test.com',
+        }
+        
+        response = self.client.patch(url, info)
+
+        self.assertRaises(ValidationError)
+        self.assertGreater(len(response.data.get('username')), 0)
+        self.assertEqual(response.data.get('email', None), None)
+    
 
     def test_is_owner_validation(self):
         self.client.force_authenticate(user=self.user2)
