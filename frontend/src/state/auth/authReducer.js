@@ -2,9 +2,8 @@ import {
     AUTH_REQUEST,
     AUTH_SUCCESS,
     AUTH_FAIL,
-    USER_REQUEST,
-    USER_SUCCESS,
-    USER_FAIL,
+    START_SUBMIT,
+    FINISH_SUBMIT,
 } from './authActionTypes'
 
 const initialState = {
@@ -12,7 +11,8 @@ const initialState = {
     isAuth: false,
     refreshToken: localStorage.getItem('refresh_token'),
     accessToken: localStorage.getItem('access_token'),
-		authLoading: true
+		authLoading: true,
+		submitting: false
 }
 
 export default function authReducer(state=initialState, action) {
@@ -37,7 +37,16 @@ export default function authReducer(state=initialState, action) {
 				user: null,
 				isAuth: false
 			}
-
+		case START_SUBMIT:
+			return {
+				...state,
+				submitting: true
+			}
+			case FINISH_SUBMIT:
+				return {
+					...state,
+					submitting: false
+				}
 		default:
 				return state
 	}

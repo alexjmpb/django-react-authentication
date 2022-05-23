@@ -6,7 +6,7 @@ import Header from '../components/header/Header';
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { checkAuth } from '../state/auth/authActions';
-import Loading from '../components/loading/Loading';
+import Loading from '../components/loading/Loading'
 
 const PrivateLayot = () => {
   const isAuth = useSelector(state => state.auth.isAuth)
@@ -19,8 +19,8 @@ const PrivateLayot = () => {
   }, [])
 
   useEffect(() => {
-    if (!isAuth && !loading) {
-      navigate('/login/')
+    if (isAuth && !loading) {
+      navigate('/')
     }
   }, [loading])
 
